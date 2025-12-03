@@ -22,21 +22,21 @@ def cycle_ping():
     running = True
 
     while True:
-        # Ping for 1 minute
-        print("🔵 Starting 1-minute ping...")
+        # 2 minutes of active ping
+        print("🔵 Starting 2-minute ping...")
         start = time.time()
-        while time.time() - start < 60:
+        while (time.time() - start) < 120:   # 120 seconds = 2 minutes
             for url in SERVERS:
                 try:
                     requests.get(url, timeout=10)
                     print("Ping →", url)
-                except:
-                    print("Failed →", url)
-            time.sleep(10)
+                except Exception as e:
+                    print("Failed →", url, "Error:", e)
+            time.sleep(10)  # ping every 10 sec
 
         # Sleep 3 minutes
-        print("🟡 Sleeping for 3 minutes...")
-        time.sleep(180)
+        print("🟡 Sleeping 3 minutes...")
+        time.sleep(180)  # 180 sec = 3 min
 
 
 @app.route("/start")
@@ -44,7 +44,7 @@ def start():
     t = threading.Thread(target=cycle_ping)
     t.daemon = True
     t.start()
-    return "Ping cycle started."
+    return "Ping cycle started (2 min ON / 3 min OFF)."
 
 
 @app.route("/")
