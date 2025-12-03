@@ -13,44 +13,34 @@ SERVERS = [
     "https://petroai-knn.onrender.com"
 ]
 
-running = False
-
 def cycle_ping():
-    global running
-    if running:
-        return
-    running = True
-
     while True:
-        # 2 minutes of active ping
-        print("🔵 Starting 2-minute ping...")
+        print("🔵 2-minute ping cycle started...")
         start = time.time()
-        while (time.time() - start) < 120:   # 120 seconds = 2 minutes
+
+        # 2 minutes active ping
+        while time.time() - start < 120:
             for url in SERVERS:
                 try:
                     requests.get(url, timeout=10)
                     print("Ping →", url)
                 except Exception as e:
-                    print("Failed →", url, "Error:", e)
-            time.sleep(10)  # ping every 10 sec
+                    print("Failed →", url, e)
+            time.sleep(10)
 
-        # Sleep 3 minutes
         print("🟡 Sleeping 3 minutes...")
-        time.sleep(180)  # 180 sec = 3 min
+        time.sleep(180)
 
 
-@app.route("/start")
-def start():
-    t = threading.Thread(target=cycle_ping)
-    t.daemon = True
-    t.start()
-    return "Ping cycle started (2 min ON / 3 min OFF)."
+# Start loop automatically at server launch
+threading.Thread(target=cycle_ping, daemon=True).start()
 
 
 @app.route("/")
 def home():
-    return "Ping cycle server is active."
+    return "Ping cycle is running automatically."
 
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
+@app.route("/start")
+def start():
+    return "Already running automatically. No need to start manually."
